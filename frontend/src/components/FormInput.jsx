@@ -19,11 +19,11 @@ function FormInput(props) {
     <div className="formInput">
       <Components.Input
         {...userData}
-        onBlur={handleFocus}
-        onFocus={() => props.name === "confirmPassword" && setFocused(true)}
+        onBlur={handleFocus} //tıklayıp gerı farklı bır yere tıkladıgında error mesajı ıcın
+        onFocus={() => props.name === "confirmPassword" && setFocused(true)} //tek tıklamayla error mesajı
         focused={focused.toString()}
       />
-      
+
       <Components.Span show={focused && !isValid}>
         {props.errormessage}
       </Components.Span>

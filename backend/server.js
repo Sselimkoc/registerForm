@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:3000"], // front end url
+    origin: ["http://localhost:5173"], // front end url
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -43,70 +43,79 @@ const verifyToken = (req, res, next) => {
     next();
   });
 };
-
-
 app.post("/login", async (req, res) => {
-  const sqlQuery = "SELECT * FROM sys.userdata WHERE userMail = ?";
-  db.query(sqlQuery, [req.body.userMail], async (err, data) => {
+  const sqlQuery = "SELECT * FROM sys.userdata WHERE uMail = ?";
+
+  db.query(sqlQuery, [req.body.email], async (err, data) => {
     if (err) {
-      console.log(err);
-      return res.json({ Message: "Server Side error" });
+      console.error(err);
+      return res.status(500).json({ Message: "Server error during login." });
     }
 
     if (data.length > 0) {
-      const hashedPassword = data[0].userPassword;
-      const passwordMatch = await bcrypt.compare(
-        req.body.userPassword,
-        hashedPassword
-      );
-
-      if (passwordMatch) {
-        const { userName, userSurname, userMail } = data[0];
-        const token = jwt.sign(
-          { userName, userSurname, userMail },
-          JWT_SECRET,
-          {
-            expiresIn: "1d",
-          }
+      try {
+        const hashedPassword = data[0].uPassword;
+        const passwordMatch = await bcrypt.compare(
+          req.body.password,
+          hashedPassword
         );
-        res.cookie("token", token);
-        console.log("Data response:", data);
-        return res.json({ Message: "Success", token: token });
-      } else {
-        console.log("Incorrect password");
-        return res.json({ Message: "Bilgilerinizi Kontrol Ediniz" });
+
+        if (passwordMatch) {
+          const { uFullname, uMail } = data[0];
+          const token = jwt.sign({ uFullname, uMail }, JWT_SECRET, {
+            expiresIn: "1d",
+          });
+          res.cookie("token", token);
+          console.log("Data response:", data);
+          return res.json({ Message: "SuccessLog", token: token });
+        } else {
+          console.log("Incorrect password");
+          return res.status(401).json({ Message: "Incorrect password." });
+        }
+      } catch (error) {
+        console.error("Error comparing passwords:", error);
+        return res.status(500).json({ Message: "Server error during login." });
       }
     } else {
       console.log("No matching record found. Data:", data);
-      return res.json({ Message: "Bilgilerinizi Kontrol Ediniz" });
+      return res.status(404).json({ Message: "User not found." });
     }
   });
 });
-
-
 app.post("/signup", async (req, res) => {
   try {
-    const hash = await bcrypt.hash(req.body.userPassword, 10);
+    const hash = await bcrypt.hash(req.body.password, 10);
     const sqlQuery =
-      "INSERT INTO sys.userdata (userName, userSurname, userMail, userPassword) VALUES (?, ?, ?, ?)";
+      "INSERT INTO sys.userdata (uFullname, uMail, uPassword) VALUES (?, ?, ?)";
+
     db.query(
       sqlQuery,
-      [req.body.userName, req.body.userSurname, req.body.userMail, hash],
+      [req.body.fullName, req.body.email, hash],
       (err, data) => {
         if (err) {
-          console.log(err);
-          return res.json({ Message: "Server Side error" });
+          console.error(err);
+
+          if (err.code === "ER_DUP_ENTRY") {
+            return res
+              .status(400)
+              .json({ Message: "This email address is already registered." });
+          } else {
+            return res
+              .status(500)
+              .json({ Message: "Server Side error during signup." });
+          }
         }
-        console.log("inserted data", data);
-        return res.json({ Message: "Success" });
+
+        console.log("Inserted data:", data);
+        return res.json({ Message: "SuccessSign" });
       }
     );
   } catch (error) {
-    console.error(error);
-    return res.json({ Message: "Error hashing password" });
+    console.error("Error hashing password:", error);
+    return res
+      .status(500)
+      .json({ Message: "Server Side error during signup." });
   }
 });
 
-
-
-app.listen(8081, () => console.log("listening"));
+app.listen(5174, () => console.log("listening"));

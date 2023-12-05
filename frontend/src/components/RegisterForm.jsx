@@ -1,22 +1,27 @@
-// RegisterForm.jsx
-import React, { useState } from "react";
+import React from "react";
 import FormInput from "./FormInput";
 import * as Components from "../assets/MenuComponents.jsx";
-
+import useFormData from "../hooks/useFormData";
 function RegisterForm(props) {
-  const [values, setValues] = useState({
+  const { type, setLogin } = props;
+  const initialValues = {
     fullName: "",
-    username: "",
     email: "",
     password: "",
     confirmPassword: "",
-  });
-  const [validate, setValidate] = useState({
-    fullName: "",
-    username: "",
-    email: "",
-    password: "",
-  });
+  };
+
+  const apiEndpoint =
+    type === "login"
+      ? "http://localhost:5174/login"
+      : "http://localhost:5174/signup";
+
+  const { values, onChange, sendData } = useFormData(
+    initialValues,
+    apiEndpoint,
+    setLogin
+  );
+
   const formInfo = [
     {
       id: 0,
@@ -24,7 +29,7 @@ function RegisterForm(props) {
       type: "text",
       placeholder: "Name and Surname",
       label: "Full Name",
-      pattern: /^[A-Za-z]+(?: [A-Za-z]+)+$/,
+      pattern: /^[A-Za-zÇçĞğİıÖöŞşÜü]+(?: [A-Za-zÇçĞğİıÖöŞşÜü]+)+$/,
       errormessage: "Please enter a valid full name",
     },
     {
@@ -44,7 +49,8 @@ function RegisterForm(props) {
       label: "Password",
       errormessage:
         "Password should be 8-20 characters and include at least 1 letter and 1 number!",
-      pattern: /^(?=.*[0-9])(?=.*[a-zA-Z])[a-zA-Z0-9]{8,20}$/,
+      pattern:
+        /^(?=.*[0-9])(?=.*[A-Za-zÇçĞğİıÖöŞşÜü])[A-Za-zÇçĞğİıÖöŞşÜü0-9]{8,20}$/,
     },
     {
       id: 3,
@@ -56,34 +62,31 @@ function RegisterForm(props) {
       validate: (value) => value === values.password,
     },
   ];
-  console.log("props", values);
+
   const idsForLogin = [1, 2];
 
   const filteredFormInfo =
-    props.type === "login"
+    type === "login"
       ? formInfo.filter((form) => idsForLogin.includes(form.id))
       : formInfo;
 
-  const onChange = (e) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
-  };
-
-  const logInfo = filteredFormInfo.map((formField) => ({
-    [formField.name]: values[formField.name],
-  }));
-  console.log("validate", validate);
   return (
-    <Components.Form>
-      {filteredFormInfo.map((formInfo) => (
-        <FormInput
-          key={formInfo.id}
-          {...formInfo}
-          value={values[formInfo.name]}
-          onChange={onChange}
-          required
-        />
-      ))}
-    </Components.Form>
+    <>
+      <Components.Form>
+        {filteredFormInfo.map((formInfo) => (
+          <FormInput
+            key={formInfo.id}
+            {...formInfo}
+            value={values[formInfo.name]}
+            onChange={onChange}
+            // required
+          />
+        ))}
+        <Components.Button onClick={sendData} style={{ marginBottom: "70px" }}>
+          {type === "login" ? "Login" : "Sign Up"}
+        </Components.Button>
+      </Components.Form>
+    </>
   );
 }
 
