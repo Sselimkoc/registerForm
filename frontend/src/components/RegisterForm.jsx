@@ -82,6 +82,8 @@ function RegisterForm(props) {
             // required
           />
         ))}
+        {/* //aktif durumda değil */}
+
         <Components.Button onClick={sendData} style={{ marginBottom: "70px" }}>
           {type === "login" ? "Login" : "Sign Up"}
         </Components.Button>

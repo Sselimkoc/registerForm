@@ -1,6 +1,4 @@
-// RegisterPage.jsx
 import React, { useState } from "react";
-import axios from "axios";
 import * as Components from "../assets/MenuComponents.jsx";
 import RegisterForm from "./RegisterForm.jsx";
 
@@ -36,7 +34,7 @@ function RegisterPage() {
             <Components.LeftOverlayPanel formtype={logIn}>
               <Components.Title>Welcome Back!</Components.Title>
               <Components.Paragraph>
-                Lorem ipsum dolor sit amet, consectetur
+                Already have an account! Log in now
               </Components.Paragraph>
               <Components.GhostButton onClick={() => setLogin(true)}>
                 Log In
@@ -46,7 +44,7 @@ function RegisterPage() {
             <Components.RightOverlayPanel formtype={logIn}>
               <Components.Title>Hello!</Components.Title>
               <Components.Paragraph>
-                Lorem ipsum dolor sit amet, consectetur
+                First time visitor? Click here to create an account
               </Components.Paragraph>
               <Components.GhostButton onClick={() => setLogin(false)}>
                 Sign Up

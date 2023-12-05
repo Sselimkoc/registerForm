@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173"], // front end url
+    origin: ["http://localhost:5173"], // Frontend URL
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -27,6 +27,7 @@ const db = mysql.createConnection({
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// Token doğrulama middleware'i
 const verifyToken = (req, res, next) => {
   const token = req.cookies.token;
 
@@ -43,9 +44,10 @@ const verifyToken = (req, res, next) => {
     next();
   });
 };
+
+// Kullanıcı girişi işlemini gerçekleştiren endpoint
 app.post("/login", async (req, res) => {
   const sqlQuery = "SELECT * FROM sys.userdata WHERE uMail = ?";
-
   db.query(sqlQuery, [req.body.email], async (err, data) => {
     if (err) {
       console.error(err);
@@ -82,6 +84,8 @@ app.post("/login", async (req, res) => {
     }
   });
 });
+
+// Yeni kullanıcı kaydını gerçekleştiren endpoint
 app.post("/signup", async (req, res) => {
   try {
     const hash = await bcrypt.hash(req.body.password, 10);
@@ -118,4 +122,12 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+
+
+// Korumalı bir route ekleyebiilirsiniz, sadece token ile erişilebilir
+// app.get("/protected", verifyToken, (req, res) => {
+//   res.json({ Message: "This is a protected route", user: req.user });
+// });
+
+// Uygulama belirtilen port üzerinden dinleniyor
 app.listen(5174, () => console.log("listening"));
