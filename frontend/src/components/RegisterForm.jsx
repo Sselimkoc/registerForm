@@ -2,6 +2,7 @@ import React from "react";
 import FormInput from "./FormInput";
 import * as Components from "../assets/MenuComponents.jsx";
 import useFormData from "../hooks/useFormData";
+
 function RegisterForm(props) {
   const { type, setLogin } = props;
   const initialValues = {
@@ -70,6 +71,23 @@ function RegisterForm(props) {
       ? formInfo.filter((form) => idsForLogin.includes(form.id))
       : formInfo;
 
+  const isButtonActive =
+    filteredFormInfo.every((formInfo) => values[formInfo.name].trim() !== "") &&
+    filteredFormInfo.every((formInfo) =>
+      formInfo.validate ? formInfo.validate(values[formInfo.name]) : true
+    );
+
+  const buttonStyle = {
+    marginBottom: "70px",
+
+  };
+
+  const disabledButtonStyle = {
+    ...buttonStyle,
+    cursor: "not-allowed",
+    backgroundColor: "#ccc",
+  };
+
   return (
     <>
       <Components.Form>
@@ -79,12 +97,13 @@ function RegisterForm(props) {
             {...formInfo}
             value={values[formInfo.name]}
             onChange={onChange}
-            // required
           />
         ))}
-        {/* //aktif durumda değil */}
-
-        <Components.Button onClick={sendData} style={{ marginBottom: "70px" }}>
+        <Components.Button
+          onClick={sendData}
+          style={isButtonActive ? buttonStyle : disabledButtonStyle}
+          disabled={!isButtonActive}
+        >
           {type === "login" ? "Login" : "Sign Up"}
         </Components.Button>
       </Components.Form>

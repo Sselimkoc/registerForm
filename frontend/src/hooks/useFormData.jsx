@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const useFormData = (initialValues, apiEndpoint, setLogin) => {
   const [values, setValues] = useState(initialValues);
+
   const navigate = useNavigate();
 
   const onChange = (e) => {
@@ -14,11 +15,11 @@ const useFormData = (initialValues, apiEndpoint, setLogin) => {
     if (error.response && error.response.status) {
       switch (error.response.status) {
         case 400:
-          // Bad Request
+        // Bad Request
         case 401:
-          // Unauthorized
+        // Unauthorized
         case 404:
-          // Not Found
+        // Not Found
         case 500:
           // Internal Server Error
           alert(error.response.data.Message);
@@ -30,6 +31,7 @@ const useFormData = (initialValues, apiEndpoint, setLogin) => {
   };
 
   const sendData = async () => {
+
     try {
       const response = await axios.post(apiEndpoint, values);
 
