@@ -124,10 +124,6 @@ app.post("/signup", async (req, res) => {
 
 
 
-// Korumalı bir route ekleyebiilirsiniz, sadece token ile erişilebilir
-// app.get("/protected", verifyToken, (req, res) => {
-//   res.json({ Message: "This is a protected route", user: req.user });
-// });
 
 // Uygulama belirtilen port üzerinden dinleniyor
 app.listen(5174, () => console.log("listening"));
